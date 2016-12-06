@@ -6,3 +6,4 @@ This repository contains my solutions for the [Advent of Code 2016](http://adven
 * **Day 3**: Bash with `sed` and `bc`
 * **Day 4**: Racket
 * **Day 5**: Elixir
+* **Day 6**: Scheme
