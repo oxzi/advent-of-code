@@ -8,3 +8,4 @@ This repository contains my solutions for the [Advent of Code 2016](http://adven
 * **Day 5**: Elixir
 * **Day 6**: Scheme
 * **Day 7**: Scala
+* **Day 8**: C++
