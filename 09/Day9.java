@@ -3,31 +3,8 @@ import java.util.regex.*;
 
 public class Day9 {
 
-  private static String strRepeat(String in, int times) {
-    return new String(new char[times]).replace("\0", in);
-  }
-
-  private static Pattern PATTERN = Pattern.compile("^\\((\\d+)x(\\d+)\\)(.*)");
-
-  public static String decompress(String in) {
-    Matcher match = PATTERN.matcher(in);
-
-    if(in.isEmpty()) {
-      return "";
-    } else if(match.matches()) {
-      int chrAmount = Integer.parseInt(match.group(1));
-      int times = Integer.parseInt(match.group(2));
-      String rest = match.group(3);
-
-      String unrolled = strRepeat(rest.substring(0, chrAmount), times);
-      return unrolled + decompress(rest.substring(chrAmount));
-    } else {
-      return in.substring(0, 1) + decompress(in.substring(1));
-    }
-  }
-
-  public static long length(String in) {
-    Matcher match = PATTERN.matcher(in);
+  public static long length(String in, int version) {
+    Matcher match = Pattern.compile("^\\((\\d+)x(\\d+)\\)(.*)").matcher(in);
 
     if(in.isEmpty()) {
       return 0;
@@ -36,22 +13,21 @@ public class Day9 {
       int times = Integer.parseInt(match.group(2));
       String rest = match.group(3);
 
-      long unrolled = length(rest.substring(0, chrAmount)) * times;
-      return unrolled + length(rest.substring(chrAmount));
+      long unrolled;
+      if(version == 1) {
+        unrolled = (rest.substring(0, chrAmount)).length() * times;
+      } else {
+        unrolled = length(rest.substring(0, chrAmount), version) * times;
+      }
+      return unrolled + length(rest.substring(chrAmount), version);
     } else {
-      return 1 + length(in.substring(1));
+      return 1 + length(in.substring(1), version);
     }
   }
 
   public static void main(String[] args) throws Throwable {
-    // Part One
     Files.lines(Paths.get("input")).
-      map(Day9::decompress).map(String::length).
-      forEach(System.out::println);
-
-    // Part Two
-    Files.lines(Paths.get("input")).
-      map(Day9::length).
+      map(x -> length(x, 1) + " " +  length(x, 2)).
       forEach(System.out::println);
   }
 }
