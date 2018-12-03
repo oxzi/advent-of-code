@@ -119,7 +119,7 @@ func (c1 Claim) Intersect(c2 Claim) (*Claim, error) {
 	return &Claim{0, x, y, width, height}, nil
 }
 
-func PartOne() {
+func main() {
 	ch := make(chan string)
 	go linewiseInput("input", ch)
 
@@ -128,7 +128,7 @@ func PartOne() {
 		claims = append(claims, NewClaim(l))
 	}
 
-	coordinates := make(map[Coordinate]bool)
+	coordinates := make(map[Coordinate]int)
 
 	for i := 0; i < len(claims); i++ {
 		for j := i + 1; j < len(claims); j++ {
@@ -139,15 +139,33 @@ func PartOne() {
 
 			coords := ci.ToCoordinates()
 			for _, coord := range coords {
-				coordinates[*coord] = true
+				if amount, ok := coordinates[*coord]; ok {
+					coordinates[*coord] = amount + 1
+				} else {
+					coordinates[*coord] = 1
+				}
 			}
 		}
 	}
 
 	fmt.Println("--- Part One ---")
 	fmt.Printf("Overlapping coordinates: %d\n\n", len(coordinates))
-}
 
-func main() {
-	PartOne()
+	for _, claim := range claims {
+		coords := claim.ToCoordinates()
+		flag := true
+
+		for _, coord := range coords {
+			if coordinates[*coord] > 0 {
+				flag = false
+				break
+			}
+		}
+
+		if flag {
+			fmt.Println("--- Part Two ---")
+			fmt.Printf("Unique claim: %v\n\n", claim)
+			break
+		}
+	}
 }
