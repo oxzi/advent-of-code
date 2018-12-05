@@ -78,7 +78,7 @@ func (g Guard) String() string {
 	return fmt.Sprintf("#%d, (%v)", g.no, g.entries)
 }
 
-func (g Guard) SleepTime() (asleepMins, sleepyMin int) {
+func (g Guard) SleepTime() (asleepMins, sleepyMin, sleepyMinOccu int) {
 	var (
 		asleepSec int64 = 0
 		sleepSecs int64 = 0
@@ -108,6 +108,7 @@ func (g Guard) SleepTime() (asleepMins, sleepyMin int) {
 			sleepyMin = i
 		}
 	}
+	sleepyMinOccu = mins[sleepyMin]
 
 	return
 }
@@ -173,17 +174,32 @@ func main() {
 	entries := readLogEntries("input")
 	guards := logEntriesToGuards(entries)
 
-	sort.Slice(guards, func(i, j int) bool {
-		giSleep, _ := guards[i].SleepTime()
-		gjSleep, _ := guards[j].SleepTime()
+	parts := []struct {
+		part    string
+		sortFun func(int, int) bool
+	}{
+		{"One", func(i, j int) bool {
+			giSleep, _, _ := guards[i].SleepTime()
+			gjSleep, _, _ := guards[j].SleepTime()
 
-		return giSleep > gjSleep
-	})
+			return giSleep > gjSleep
+		}},
+		{"Two", func(i, j int) bool {
+			_, _, gi := guards[i].SleepTime()
+			_, _, gj := guards[j].SleepTime()
 
-	no := guards[0].no
-	_, mins := guards[0].SleepTime()
+			return gi > gj
+		}},
+	}
 
-	fmt.Println("--- Part One ---")
-	fmt.Printf("Guard #%d sleept a lot; a most at minute %d → %d\n\n",
-		no, mins, no*mins)
+	for _, part := range parts {
+		sort.Slice(guards, part.sortFun)
+
+		no := guards[0].no
+		_, mins, _ := guards[0].SleepTime()
+
+		fmt.Printf("--- Part %s ---\n", part.part)
+		fmt.Printf("Guard #%d sleept a lot; most at minute %d → %d\n\n",
+			no, mins, no*mins)
+	}
 }
